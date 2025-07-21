@@ -101,14 +101,25 @@ export function sanitizeText(text: string) {
 }
 
 export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {
-  return messages.map((message) => ({
-    id: message.id,
-    role: message.role as 'user' | 'assistant' | 'system',
-    parts: message.parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
-    metadata: {
-      createdAt: formatISO(message.createdAt),
-    },
-  }));
+  return messages.map((message) => {
+    // Defensive: handle invalid dates
+    const rawDate = message.createdAt;
+    let createdAt: string = '';
+    if (rawDate) {
+      const dateObj = new Date(rawDate);
+      if (!isNaN(dateObj.getTime())) {
+        createdAt = formatISO(dateObj);
+      }
+    }
+    return {
+      id: message.id,
+      role: message.role as 'user' | 'assistant' | 'system',
+      parts: message.parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
+      metadata: {
+        createdAt,
+      },
+    };
+  });
 }
 
 export function getTextFromMessage(message: ChatMessage): string {

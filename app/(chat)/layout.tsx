@@ -23,8 +23,10 @@ export default async function Layout({
       />
       <DataStreamProvider>
         <SidebarProvider defaultOpen={!isCollapsed}>
-          <AppSidebar user={undefined} />
-          <SidebarInset>{children}</SidebarInset>
+          <div className="chat-layout-row">
+            <AppSidebar user={undefined} />
+            <SidebarInset>{children}</SidebarInset>
+          </div>
         </SidebarProvider>
       </DataStreamProvider>
     </>

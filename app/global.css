@@ -346,6 +346,21 @@
     @import 'fumadocs-ui/style.css';
 }
 
+body, html, #__next {
+  height: 100vh !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#__next > * {
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 0;
+}
+
 [data-sidebar="wrapper"] {
     width: 260px;
     min-width: 200px;
@@ -365,3 +380,22 @@
     max-width: 64px !important;
     overflow: hidden;
   }
+
+/* Ensure chat layout always uses flex row and does not wrap */
+.chat-layout-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: 100vw !important;
+  min-height: 100vh !important;
+  height: 100vh !important;
+  align-items: stretch !important;
+  position: relative;
+  z-index: 1;
+}
+
+.chat-layout-row > * {
+  min-height: 100vh !important;
+  min-width: 0 !important;
+  flex-shrink: 0;
+}
