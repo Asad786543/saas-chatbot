@@ -150,10 +150,20 @@ export async function getChatsByUserId({
       .order('created_at', { ascending: false })
       .limit(limit);
     const { data, error } = await query;
-    if (error) throw error;
+    // Debug logging
+    console.log('getChatsByUserId: searching for user_id:', id);
+    console.log('getChatsByUserId: query result:', { data, error });
     const hasMore = data.length > limit;
+    // Map snake_case to camelCase ONLY for chat history
+    const mappedChats = (hasMore ? data.slice(0, limit) : data).map((chat: any) => ({
+      id: chat.id,
+      createdAt: chat.created_at,
+      title: chat.title,
+      userId: chat.user_id,
+      visibility: chat.visibility,
+    }));
     return {
-      chats: hasMore ? data.slice(0, limit) : data,
+      chats: mappedChats,
       hasMore,
     };
   } catch (error) {

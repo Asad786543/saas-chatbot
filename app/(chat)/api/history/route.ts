@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { getChatsByUserId } from '@/lib/db/queries';
 import { ChatSDKError } from '@/lib/errors';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -16,8 +17,16 @@ export async function GET(request: NextRequest) {
     ).toResponse();
   }
 
+  // Get current user from Supabase Auth
+  let userId: string | null = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    if (data?.user?.id) userId = data.user.id;
+  } catch { userId = null; }
+
   const chats = await getChatsByUserId({
-    id: 'public-user', // Placeholder for userId
+    id: userId, // Use logged-in user's ID or null for guests
     limit,
     startingAfter,
     endingBefore,

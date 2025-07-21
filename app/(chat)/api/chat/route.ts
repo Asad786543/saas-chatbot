@@ -36,6 +36,7 @@ import { ChatSDKError } from '@/lib/errors';
 import type { ChatMessage } from '@/lib/types';
 import type { ChatModel } from '@/lib/ai/models';
 import type { VisibilityType } from '@/components/chatbot/visibility-selector';
+import { createClient } from '@/utils/supabase/server';
 
 export const maxDuration = 60;
 
@@ -84,6 +85,14 @@ export async function POST(request: Request) {
       selectedVisibilityType: VisibilityType;
     } = requestBody;
 
+    // Get current user from Supabase Auth
+    let userId: string | null = null;
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.auth.getUser();
+      if (data?.user?.id) userId = data.user.id;
+    } catch { userId = null; }
+
     const chat = await getChatById({ id });
 
     if (!chat) {
@@ -93,7 +102,7 @@ export async function POST(request: Request) {
 
       await saveChat({
         id,
-        userId: null, // allow guests
+        userId,
         title,
         visibility: selectedVisibilityType,
       });
@@ -120,6 +129,7 @@ export async function POST(request: Request) {
           parts: message.parts,
           attachments: [],
           createdAt: new Date(),
+          userId, // PATCH: associate message with user
         },
       ],
     });
@@ -177,6 +187,7 @@ export async function POST(request: Request) {
             createdAt: new Date(),
             attachments: [],
             chatId: id,
+            userId, // PATCH: associate streamed messages with user
           })),
         });
       },
