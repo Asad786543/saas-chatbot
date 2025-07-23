@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './code-block';
 
 const components: Partial<Components> = {
-  // @ts-expect-error
+  // @ts-expect-error CodeBlock expects props different from react-markdown's code component
   code: CodeBlock,
   pre: ({ children }) => <>{children}</>,
   ol: ({ node, children, ...props }) => {
@@ -38,7 +38,7 @@ const components: Partial<Components> = {
   },
   a: ({ node, children, ...props }) => {
     return (
-      // @ts-expect-error
+      // @ts-expect-error Link from next/link expects different props than react-markdown's a component
       <Link
         className="text-blue-500 hover:underline"
         target="_blank"

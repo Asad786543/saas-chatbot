@@ -48,8 +48,14 @@ export function getStreamContext() {
       globalStreamContext = createResumableStreamContext({
         waitUntil: after,
       });
-    } catch (error: any) {
-      if (error.message.includes('REDIS_URL')) {
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'message' in error &&
+        typeof (error as { message: unknown }).message === 'string' &&
+        (error as { message: string }).message.includes('REDIS_URL')
+      ) {
         console.log(
           ' > Resumable streams are disabled due to missing REDIS_URL',
         );
@@ -109,7 +115,16 @@ export async function POST(request: Request) {
     } // No else: allow all users/guests
 
     const messagesFromDb = await getMessagesByChatId({ id });
-    const uiMessages = [...convertToUIMessages(messagesFromDb), message];
+    // Map messagesFromDb to DBMessage shape if needed
+    const dbMessages = messagesFromDb.map((msg: any) => ({
+      id: msg.id,
+      chatId: msg.chat_id,
+      role: msg.role,
+      parts: 'parts' in msg ? msg.parts ?? [] : [],
+      attachments: msg.attachments ?? [],
+      createdAt: new Date(msg.created_at),
+    }));
+    const uiMessages = [...convertToUIMessages(dbMessages), message];
 
     const { longitude, latitude, city, country } = geolocation(request);
 
@@ -123,13 +138,13 @@ export async function POST(request: Request) {
     await saveMessages({
       messages: [
         {
-          chatId: id,
           id: message.id,
-          role: 'user',
+          chat_id: id, // id is the chat id from the route
+          user_id: userId ?? null,
           parts: message.parts,
           attachments: [],
-          createdAt: new Date(),
-          userId, // PATCH: associate message with user
+          role: 'user',
+          created_at: new Date().toISOString(),
         },
       ],
     });
@@ -182,12 +197,12 @@ export async function POST(request: Request) {
         await saveMessages({
           messages: messages.map((message) => ({
             id: message.id,
-            role: message.role,
+            chat_id: id,
+            user_id: userId ?? null,
             parts: message.parts,
-            createdAt: new Date(),
             attachments: [],
-            chatId: id,
-            userId, // PATCH: associate streamed messages with user
+            role: message.role,
+            created_at: new Date().toISOString(),
           })),
         });
       },
@@ -209,7 +224,17 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error('POST /api/chat error:', error);
-    return new Response(JSON.stringify({ error: error?.message || 'Internal Server Error' }), { status: 500 });
+    let errorMessage = 'Internal Server Error';
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      typeof (error as { message: unknown }).message === 'string'
+    ) {
+      errorMessage = (error as { message: string }).message;
+    }
+    
+    return new Response(JSON.stringify({ error: errorMessage }), { status: 500 });
   }
 }
 
@@ -223,7 +248,7 @@ export async function DELETE(request: Request) {
 
   const chat = await getChatById({ id });
 
-  if (chat.userId !== 'public-user') {
+  if (!chat || chat.user_id !== 'public-user') {
     return new ChatSDKError('forbidden:chat').toResponse();
   }
 

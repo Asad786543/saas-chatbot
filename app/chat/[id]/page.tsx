@@ -5,20 +5,29 @@ import { supabase } from '@/utils/supabase/client';
 import { Chat } from '@/components/chatbot/chat';
 import { convertToUIMessages } from '@/lib/utils';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
+import type { DBMessage } from '@/lib/db/schema';
 
 export default function ChatPage() {
   const { id } = useParams();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<DBMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchMessages() {
+      if (typeof id !== 'string') return;
       const { data, error } = await supabase
         .from('messages')
         .select('*')
         .eq('chat_id', id)
         .order('created_at', { ascending: true });
-      setMessages(data || []);
+      const mapped = (data || []).map((msg) => ({
+        ...msg,
+        chatId: msg.chat_id,
+        createdAt: new Date(msg.created_at),
+        parts: 'parts' in msg ? msg.parts ?? [] : [],
+        attachments: msg.attachments ?? [],
+      }));
+      setMessages(mapped);
       setLoading(false);
     }
     fetchMessages();
@@ -31,7 +40,7 @@ export default function ChatPage() {
 
   return (
     <Chat
-      id={typeof id === 'string' ? id : id?.[0]}
+      id={typeof id === 'string' ? id : (Array.isArray(id) ? id[0] ?? '' : '')}
       initialMessages={initialMessages}
       initialChatModel={DEFAULT_CHAT_MODEL}
       initialVisibilityType="private"

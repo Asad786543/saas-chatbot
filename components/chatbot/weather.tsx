@@ -45,7 +45,7 @@ interface WeatherAtLocation {
 const SAMPLE = {
   latitude: 37.763283,
   longitude: -122.41286,
-  generationtime_ms: 0.027894973754882812,
+  generationtime_ms: 0.027895, // Reduced precision to avoid no-loss-of-precision error
   utc_offset_seconds: 0,
   timezone: 'GMT',
   timezone_abbreviation: 'GMT',

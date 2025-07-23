@@ -111,6 +111,7 @@ export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {
         createdAt = formatISO(dateObj);
       }
     }
+    
     return {
       id: message.id,
       role: message.role as 'user' | 'assistant' | 'system',

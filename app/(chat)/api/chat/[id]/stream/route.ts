@@ -30,7 +30,17 @@ export async function GET(
   let chat: Chat;
 
   try {
-    chat = await getChatById({ id: chatId });
+    const chatData = await getChatById({ id: chatId });
+    if (!chatData) {
+      throw new Error('Chat not found');
+    }
+    chat = {
+      id: chatData.id,
+      title: chatData.title,
+      createdAt: new Date(chatData.created_at),
+      userId: chatData.user_id,
+      visibility: chatData.visibility as 'public' | 'private',
+    };
   } catch {
     return new ChatSDKError('not_found:chat').toResponse();
   }
@@ -79,7 +89,7 @@ export async function GET(
       return new Response(emptyDataStream, { status: 200 });
     }
 
-    const messageCreatedAt = new Date(mostRecentMessage.createdAt);
+    const messageCreatedAt = new Date(mostRecentMessage.created_at);
 
     if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
       return new Response(emptyDataStream, { status: 200 });

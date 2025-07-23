@@ -12,11 +12,11 @@ export async function GET(request: Request) {
     ).toResponse();
   }
 
-  const suggestions = await getSuggestionsByDocumentId({
+  const suggestions = (await getSuggestionsByDocumentId({
     documentId,
-  });
+  })) ?? [];
 
-  const [suggestion] = suggestions;
+  const suggestion = suggestions[0];
 
   if (!suggestion) {
     return Response.json([], { status: 200 });

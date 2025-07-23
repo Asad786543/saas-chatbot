@@ -17,9 +17,9 @@ export async function GET(request: Request) {
     ).toResponse();
   }
 
-  const documents = await getDocumentsById({ id });
+  const documents = (await getDocumentsById({ id })) ?? [];
 
-  const [document] = documents;
+  const document = documents[0];
 
   if (!document) {
     return new ChatSDKError('not_found:document').toResponse();
@@ -46,18 +46,16 @@ export async function POST(request: Request) {
   }: { content: string; title: string; kind: ArtifactKind } =
     await request.json();
 
-  const documents = await getDocumentsById({ id });
+  const documents = (await getDocumentsById({ id })) ?? [];
 
-  if (documents.length > 0) {
-    const [document] = documents;
-  }
+  // No need to destructure or use document here
 
   const document = await saveDocument({
     id,
     content,
     title,
     kind,
-    userId: null, // Placeholder for userId
+    userId: '', // Use empty string as placeholder for userId
   });
 
   return Response.json(document, { status: 200 });
@@ -82,9 +80,9 @@ export async function DELETE(request: Request) {
     ).toResponse();
   }
 
-  const documents = await getDocumentsById({ id });
+  const documents = (await getDocumentsById({ id })) ?? [];
 
-  const [document] = documents;
+  // No need to destructure or use document here
 
   const documentsDeleted = await deleteDocumentsByIdAfterTimestamp({
     id,

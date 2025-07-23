@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { VariantProps, cva } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { PanelLeft } from 'lucide-react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -109,6 +109,7 @@ const SidebarProvider = React.forwardRef<
       };
 
       window.addEventListener('keydown', handleKeyDown);
+      
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [toggleSidebar]);
 
@@ -542,7 +543,7 @@ const SidebarMenuButton = React.forwardRef<
     asChild?: boolean;
     isActive?: boolean;
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
-  } & VariantProps<typeof sidebarMenuButtonVariants>
+  } & React.ComponentProps<typeof sidebarMenuButtonVariants>
 >(
   (
     {

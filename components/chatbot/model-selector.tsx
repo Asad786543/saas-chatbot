@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 
 import { CheckCircleFillIcon, ChevronDownIcon } from './icons';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
+import type { UserType } from '@/lib/ai/entitlements';
 
 export function ModelSelector({ session, selectedModelId, className, ...props }: { session?: any; selectedModelId: string } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
@@ -22,8 +23,8 @@ export function ModelSelector({ session, selectedModelId, className, ...props }:
     useOptimistic(selectedModelId);
 
   // Default to 'guest' if no userType
-  const userType = session?.user?.type || 'guest';
-  const entitlements = entitlementsByUserType[userType] || entitlementsByUserType['guest'];
+  const userType: UserType = (session?.user?.type === 'regular') ? 'regular' : 'guest';
+  const entitlements = entitlementsByUserType[userType as UserType];
   const { availableChatModelIds } = entitlements;
 
   const availableChatModels = chatModels.filter((chatModel) =>

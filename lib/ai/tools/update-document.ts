@@ -21,29 +21,33 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
     execute: async ({ id, description }) => {
       const document = await getDocumentById({ id });
 
-      if (!document) {
+      if (!document || typeof document !== 'object' || !('kind' in document) || !('title' in document) || !('content' in document) || !('created_at' in document) || !('user_id' in document)) {
         return {
           error: 'Document not found',
         };
       }
 
-      dataStream.write({
-        type: 'data-clear',
-        data: null,
-        transient: true,
-      });
+      // Map DB fields to expected document shape
+      const mappedDocument = {
+        id: (document as any).id,
+        title: (document as any).title,
+        content: (document as any).content,
+        kind: (document as any).kind,
+        createdAt: new Date((document as any).created_at),
+        userId: (document as any).user_id,
+      };
 
       const documentHandler = documentHandlersByArtifactKind.find(
         (documentHandlerByArtifactKind) =>
-          documentHandlerByArtifactKind.kind === document.kind,
+          documentHandlerByArtifactKind.kind === mappedDocument.kind,
       );
 
       if (!documentHandler) {
-        throw new Error(`No document handler found for kind: ${document.kind}`);
+        throw new Error(`No document handler found for kind: ${mappedDocument.kind}`);
       }
 
       await documentHandler.onUpdateDocument({
-        document,
+        document: mappedDocument,
         description,
         dataStream,
         session,
@@ -53,8 +57,8 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
 
       return {
         id,
-        title: document.title,
-        kind: document.kind,
+        title: mappedDocument.title,
+        kind: mappedDocument.kind,
         content: 'The document has been updated successfully.',
       };
     },

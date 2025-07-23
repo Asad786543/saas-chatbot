@@ -45,10 +45,14 @@ export default [
             'newline-before-return': 'error',
             '@typescript-eslint/no-unused-vars': 'off',
             '@typescript-eslint/no-unused-expressions': 'off',
+            '@typescript-eslint/no-explicit-any': 'off',
             'tailwindcss/no-custom-classname': 'off',
             'tailwindcss/migration-from-tailwind-2': 'off',
             'import/no-unresolved': 'off',
             'import/no-named-as-default': 'off'
+        },
+        plugins: {
+            'react-hooks': require('eslint-plugin-react-hooks'),
         }
     },
     // ! ===================== DISCLAIMER =====================

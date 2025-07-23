@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -20,19 +21,32 @@ import { useRouter } from 'next/navigation';
 import { toast } from './toast';
 import { LoaderIcon } from './icons';
 import { guestRegex } from '@/lib/constants';
+import { supabase } from '@/utils/supabase/client';
 
 export function SidebarUserNav() {
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  // No user info, just show theme toggle
+  useEffect(() => {
+    supabase.auth.getUser()
+      .then(({ data }) => {
+        setUserEmail(data?.user?.email ?? null);
+        
+        return null; // Ensure then() returns a value
+      })
+      .catch(() => {
+        setUserEmail(null);
+      });
+  }, []);
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10">
-              <span className="truncate">Guest</span>
+              <span className="truncate">{userEmail || 'Guest'}</span>
               <ChevronUp className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

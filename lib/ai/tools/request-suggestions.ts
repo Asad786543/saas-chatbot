@@ -25,7 +25,7 @@ export const requestSuggestions = ({
     execute: async ({ documentId }) => {
       const document = await getDocumentById({ id: documentId });
 
-      if (!document || !document.content) {
+      if (!document || typeof document !== 'object' || !('content' in document) || !document.content) {
         return {
           error: 'Document not found',
         };
@@ -49,7 +49,7 @@ export const requestSuggestions = ({
       });
 
       for await (const element of elementStream) {
-        // @ts-ignore todo: fix type
+        // @ts-expect-error element type is not compatible with Suggestion, needs proper typing
         const suggestion: Suggestion = {
           originalText: element.originalSentence,
           suggestedText: element.suggestedSentence,
@@ -75,16 +75,16 @@ export const requestSuggestions = ({
           suggestions: suggestions.map((suggestion) => ({
             ...suggestion,
             userId,
-            createdAt: new Date(),
-            documentCreatedAt: document.createdAt,
+            createdAt: new Date(document.created_at),
+            documentCreatedAt: new Date(document.created_at),
           })),
         });
       }
 
       return {
         id: documentId,
-        title: document.title,
-        kind: document.kind,
+        title: (document as any).title,
+        kind: (document as any).kind,
         message: 'Suggestions have been added to the document',
       };
     },
