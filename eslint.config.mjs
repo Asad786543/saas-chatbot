@@ -1,6 +1,5 @@
 import pluginJs from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
-
 import eslintConfigPrettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
 import pluginPromise from 'eslint-plugin-promise';
@@ -8,6 +7,7 @@ import pluginReact from 'eslint-plugin-react';
 // import tailwind from 'eslint-plugin-tailwindcss';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 
 export default [
     {
@@ -52,7 +52,7 @@ export default [
             'import/no-named-as-default': 'off'
         },
         plugins: {
-            'react-hooks': require('eslint-plugin-react-hooks'),
+            'react-hooks': eslintPluginReactHooks,
         }
     },
     // ! ===================== DISCLAIMER =====================
