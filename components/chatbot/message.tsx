@@ -48,6 +48,11 @@ const PurePreviewMessage = ({
     (part) => part.type === 'file',
   );
 
+  // Debug log
+  if (attachmentsFromMessage.length > 0) {
+    console.log('Rendering attachments:', attachmentsFromMessage);
+  }
+
   useDataStream();
 
   return (
@@ -86,12 +91,12 @@ const PurePreviewMessage = ({
                 data-testid={`message-attachments`}
                 className="flex flex-row justify-end gap-2"
               >
-                {attachmentsFromMessage.map((attachment) => (
+                {attachmentsFromMessage.map((attachment, idx) => (
                   <PreviewAttachment
-                    key={attachment.url}
+                    key={attachment.url || idx}
                     attachment={{
-                      name: attachment.filename ?? 'file',
-                      contentType: attachment.mediaType,
+                      name: attachment.name ?? attachment.filename ?? 'file',
+                      contentType: attachment.contentType ?? attachment.mediaType,
                       url: attachment.url,
                     }}
                   />

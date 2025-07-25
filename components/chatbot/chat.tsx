@@ -82,6 +82,8 @@ export function Chat({
     },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
+      // Force re-fetch of messages after a message is sent
+      mutate(`/api/chat?chatId=${id}`);
     },
     onError: (error) => {
       if (error instanceof ChatSDKError) {

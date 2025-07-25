@@ -152,40 +152,22 @@ export async function POST(request: Request) {
           },
         ],
       });
-      // Generate a reply acknowledging the file(s)
-      const fileLinks = fileParts.map((file: any) => `${file.name}: ${file.url}`).join(', ');
-      const replyText = `You sent a file: ${fileLinks}`;
-      // Save the assistant's reply
-      const replyMessage = {
-        id: generateUUID(),
-        chat_id: id,
-        user_id: null,
-        parts: [{ type: 'text', text: replyText }],
-        attachments: [],
-        role: 'assistant',
-        created_at: new Date().toISOString(),
-      };
-      await saveMessages({ messages: [replyMessage] });
-      
-      return new Response(
-        JSON.stringify({ reply: replyText }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
+      // Do NOT return early for file messages; continue to AI generation logic
+    } else {
+      await saveMessages({
+        messages: [
+          {
+            id: message.id,
+            chat_id: id, // id is the chat id from the route
+            user_id: userId ?? null,
+            parts: message.parts,
+            attachments: [],
+            role: 'user',
+            created_at: new Date().toISOString(),
+          },
+        ],
+      });
     }
-
-    await saveMessages({
-      messages: [
-        {
-          id: message.id,
-          chat_id: id, // id is the chat id from the route
-          user_id: userId ?? null,
-          parts: message.parts,
-          attachments: [],
-          role: 'user',
-          created_at: new Date().toISOString(),
-        },
-      ],
-    });
 
     const streamId = generateUUID();
     await createStreamId({ streamId, chatId: id });

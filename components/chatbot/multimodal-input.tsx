@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useSWRConfig } from 'swr';
 
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
@@ -58,6 +59,7 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const { mutate } = useSWRConfig();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -109,23 +111,37 @@ function PureMultimodalInput({
   const submitForm = useCallback(() => {
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
+    // Always send attachments as file parts, even if input is empty
+    const fileParts = attachments.map((attachment) => ({
+      type: 'file' as const,
+      url: attachment.url,
+      name: attachment.name,
+      contentType: attachment.contentType,
+      mediaType: attachment.contentType, // add mediaType for FileUIPart compatibility
+    }));
+
+    // Build parts array and filter out undefined
+    const parts = [
+      ...fileParts,
+      input.trim().length > 0
+        ? {
+            type: 'text' as const,
+            text: input,
+          }
+        : undefined,
+    ].filter((part): part is { type: 'file'; url: string; name: string; contentType: string; mediaType: string } | { type: 'text'; text: string } => part !== undefined);
+
+    if (parts.length === 0) {
+      // Do not send empty messages
+      return;
+    }
+
     sendMessage({
       role: 'user',
-      parts: [
-        ...attachments
-          .filter((attachment) => attachment.url && attachment.name && attachment.contentType && (attachment.contentType === 'image/jpeg' || attachment.contentType === 'image/png' || attachment.contentType === 'image/jpg'))
-          .map((attachment) => ({
-            type: 'file' as const,
-            url: attachment.url,
-            name: attachment.name,
-            mediaType: attachment.contentType === 'image/jpg' ? 'image/jpeg' : attachment.contentType,
-          })),
-        {
-          type: 'text',
-          text: input,
-        },
-      ],
+      parts,
     });
+    // Force re-fetch of messages after sending a file or any message
+    mutate(`/api/chat?chatId=${chatId}`);
 
     setAttachments([]);
     setLocalStorageInput('');
@@ -144,6 +160,7 @@ function PureMultimodalInput({
     setLocalStorageInput,
     width,
     chatId,
+    mutate,
   ]);
 
   const uploadFile = async (file: File) => {
@@ -158,12 +175,11 @@ function PureMultimodalInput({
 
       if (response.ok) {
         const data = await response.json();
-        const { url, pathname, contentType } = data;
-
+        // Use the correct fields from the API response
         return {
-          url,
-          name: pathname,
-          contentType: contentType,
+          url: data.url,
+          name: data.name, // use the name returned by the API
+          contentType: data.contentType, // use the contentType returned by the API
         };
       }
       const { error } = await response.json();
@@ -403,7 +419,8 @@ function PureSendButton({
         event.preventDefault();
         submitForm();
       }}
-      disabled={input.length === 0 || uploadQueue.length > 0}
+      // Enable send button if there are attachments, even if input is empty
+      disabled={input.length === 0 && uploadQueue.length === 0}
     >
       <ArrowUpIcon size={14} />
     </Button>

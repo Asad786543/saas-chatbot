@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
   // Upload to Supabase Storage
   const { data, error } = await supabase.storage
-    .from('chatbot-files') // changed bucket name to 'chatbot-files'
+    .from('chatbot-files')
     .upload(filePath, file, {
       cacheControl: '3600',
       upsert: false
@@ -31,8 +31,17 @@ export async function POST(request: Request) {
 
   // Get the public URL
   const { data: publicUrlData } = supabase.storage
-    .from('chatbot-files') // changed bucket name to 'chatbot-files'
+    .from('chatbot-files')
     .getPublicUrl(filePath);
 
-  return NextResponse.json({ url: publicUrlData.publicUrl });
+  // Return url, name, and contentType for correct attachment rendering
+  return NextResponse.json({
+    url: publicUrlData.publicUrl,
+    name: (file as File).name,
+    contentType: (file as File).type,
+  });
+}
+
+export function GET() {
+  return new Response('Method Not Allowed', { status: 405 });
 }
