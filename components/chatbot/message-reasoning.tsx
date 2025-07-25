@@ -42,7 +42,7 @@ export function MessageReasoning({
         </div>
       ) : (
         <div className="flex flex-row gap-2 items-center">
-          <div className="font-medium">Reasoned for a few seconds</div>
+          <div className="text-canvas-text-contrast ">Reasoned for a few seconds</div>
           <button
             data-testid="message-reasoning-toggle"
             type="button"
@@ -67,7 +67,7 @@ export function MessageReasoning({
             variants={variants}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
             style={{ overflow: 'hidden' }}
-            className="pl-4 text-zinc-600 dark:text-zinc-400 border-l flex flex-col gap-4"
+            className="pl-4 text-canvas-text border-l flex flex-col gap-4"
           >
             <Markdown>{reasoning}</Markdown>
           </motion.div>

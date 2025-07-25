@@ -18,8 +18,8 @@ import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
-import { Button } from '../botui/button';
-import { Textarea } from '../botui/textarea';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/input';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
@@ -112,12 +112,14 @@ function PureMultimodalInput({
     sendMessage({
       role: 'user',
       parts: [
-        ...attachments.map((attachment) => ({
-          type: 'file' as const,
-          url: attachment.url,
-          name: attachment.name,
-          mediaType: attachment.contentType,
-        })),
+        ...attachments
+          .filter((attachment) => attachment.url && attachment.name && attachment.contentType && (attachment.contentType === 'image/jpeg' || attachment.contentType === 'image/png' || attachment.contentType === 'image/jpg'))
+          .map((attachment) => ({
+            type: 'file' as const,
+            url: attachment.url,
+            name: attachment.name,
+            mediaType: attachment.contentType === 'image/jpg' ? 'image/jpeg' : attachment.contentType,
+          })),
         {
           type: 'text',
           text: input,
@@ -219,7 +221,6 @@ function PureMultimodalInput({
             <Button
               data-testid="scroll-to-bottom-button"
               className="rounded-full"
-              size="icon"
               variant="outline"
               onClick={(event) => {
                 event.preventDefault();
@@ -286,6 +287,7 @@ function PureMultimodalInput({
         )}
         rows={2}
         autoFocus
+        bare
         onKeyDown={(event) => {
           if (
             event.key === 'Enter' &&

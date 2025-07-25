@@ -23,7 +23,7 @@ export default async function Layout({
       />
       <DataStreamProvider>
         <SidebarProvider defaultOpen={!isCollapsed}>
-          <div className="chat-layout-row">
+          <div className="flex flex-row flex-nowrap w-screen min-h-screen h-screen items-stretch relative z-[1]">
             <AppSidebar user={undefined} />
             <SidebarInset>{children}</SidebarInset>
           </div>

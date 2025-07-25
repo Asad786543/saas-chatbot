@@ -40,7 +40,7 @@ const components: Partial<Components> = {
     return (
       // @ts-expect-error Link from next/link expects different props than react-markdown's a component
       <Link
-        className="text-blue-500 hover:underline"
+        className="text-primary-solid hover:underline"
         target="_blank"
         rel="noreferrer"
         {...props}

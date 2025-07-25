@@ -11,7 +11,7 @@ import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
-import { Button } from '../botui/button';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../botui/tooltip';
 import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
@@ -123,7 +123,7 @@ const PurePreviewMessage = ({
                             <Button
                               data-testid="message-edit-button"
                               variant="ghost"
-                              className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
+                              className="px-2 h-fit rounded-full text-canvas-text opacity-0 group-hover/message:opacity-100"
                               onClick={() => {
                                 setMode('edit');
                               }}
@@ -138,8 +138,9 @@ const PurePreviewMessage = ({
                       <div
                         data-testid="message-content"
                         className={cn('flex flex-col gap-4', {
-                          'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
-                            message.role === 'user',
+                          'bg-primary px-3 py-2 rounded-xl': message.role === 'user',
+                          'text-canvas-text-contrast': message.role === 'user',
+                          'text-canvas-text': message.role === 'assistant',
                         })}
                       >
                         <Markdown>{sanitizeText(part.text)}</Markdown>
@@ -366,7 +367,7 @@ export const ThinkingMessage = () => {
         </div>
 
         <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-col gap-4 text-muted-foreground">
+          <div className="flex flex-col gap-4 text-canvas-text ">
             Hmm...
           </div>
         </div>

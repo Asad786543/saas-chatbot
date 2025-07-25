@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '../botui/button';
+import { Button } from '@/components/ui/button';
 import {
   type Dispatch,
   type SetStateAction,
@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Textarea } from '../botui/textarea';
+import { Textarea } from '@/components/ui/input';
 import { deleteTrailingMessages } from '@/app/(public)/(chatbot)/actions';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { ChatMessage } from '@/lib/types';
@@ -74,7 +74,7 @@ export function MessageEditor({
         </Button>
         <Button
           data-testid="message-editor-send-button"
-          variant="default"
+          variant="solid"
           className="h-fit py-2 px-3"
           disabled={isSubmitting}
           onClick={async () => {

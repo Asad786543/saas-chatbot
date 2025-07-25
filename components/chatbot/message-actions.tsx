@@ -4,7 +4,7 @@ import { useCopyToClipboard } from 'usehooks-ts';
 import type { Vote } from '@/lib/db/schema';
 
 import { CopyIcon, ThumbDownIcon, ThumbUpIcon } from './icons';
-import { Button } from '../botui/button';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,

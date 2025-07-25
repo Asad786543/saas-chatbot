@@ -1,60 +1,38 @@
-import { put } from '@vercel/blob';
+import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
-// Use Blob instead of File since File is not available in Node.js environment
-const FileSchema = z.object({
-  file: z
-    .instanceof(Blob)
-    .refine((file) => file.size <= 5 * 1024 * 1024, {
-      message: 'File size should be less than 5MB',
-    })
-    // Update the file type based on the kind of files you want to accept
-    .refine((file) => ['image/jpeg', 'image/png'].includes(file.type), {
-      message: 'File type should be JPEG or PNG',
-    }),
-});
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: Request) {
-  if (request.body === null) {
-    return new Response('Request body is empty', { status: 400 });
+  const formData = await request.formData();
+  const file = formData.get('file');
+
+  if (!file) {
+    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
   }
 
-  try {
-    const formData = await request.formData();
-    const file = formData.get('file') as Blob;
+  // Use a timestamp or random string to avoid collisions
+  const filePath = `uploads/${Date.now()}-${(file as File).name}`;
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-    }
+  // Upload to Supabase Storage
+  const { data, error } = await supabase.storage
+    .from('chatbot-files') // changed bucket name to 'chatbot-files'
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
 
-    const validatedFile = FileSchema.safeParse({ file });
-
-    if (!validatedFile.success) {
-      const errorMessage = validatedFile.error.errors
-        .map((error) => error.message)
-        .join(', ');
-
-      return NextResponse.json({ error: errorMessage }, { status: 400 });
-    }
-
-    // Get filename from formData since Blob doesn't have name property
-    const filename = (formData.get('file') as File).name;
-    const fileBuffer = await file.arrayBuffer();
-
-    try {
-      const data = await put(`${filename}`, fileBuffer, {
-        access: 'public',
-      });
-
-      return NextResponse.json(data);
-    } catch (error) {
-      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
-    }
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to process request' },
-      { status: 500 },
-    );
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Get the public URL
+  const { data: publicUrlData } = supabase.storage
+    .from('chatbot-files') // changed bucket name to 'chatbot-files'
+    .getPublicUrl(filePath);
+
+  return NextResponse.json({ url: publicUrlData.publicUrl });
 }

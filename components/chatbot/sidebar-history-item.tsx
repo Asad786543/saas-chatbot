@@ -100,7 +100,7 @@ const PureChatItem = ({
           </DropdownMenuSub>
 
           <DropdownMenuItem
-            className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive dark:text-red-500"
+            className="cursor-pointer text-error focus:bg-error/15 focus:text-error text-error"
             onSelect={() => onDelete(chat.id)}
           >
             <TrashIcon />

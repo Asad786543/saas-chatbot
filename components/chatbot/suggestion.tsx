@@ -7,7 +7,7 @@ import { useWindowSize } from 'usehooks-ts';
 import type { UISuggestion } from '@/lib/editor/suggestions';
 
 import { CrossIcon, MessageIcon } from './icons';
-import { Button } from '../botui/button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ArtifactKind } from './artifact';
 
@@ -55,7 +55,7 @@ export const Suggestion = ({
             </div>
             <button
               type="button"
-              className="text-xs text-gray-500 cursor-pointer"
+              className="text-xs text-muted-foreground cursor-pointer"
               onClick={() => {
                 setIsExpanded(false);
               }}

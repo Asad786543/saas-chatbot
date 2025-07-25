@@ -1,5 +1,5 @@
 import { TerminalWindowIcon, LoaderIcon, CrossSmallIcon } from './icons';
-import { Button } from '../botui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dispatch,
   SetStateAction,
@@ -106,7 +106,7 @@ return () => {
           <Button
             variant="ghost"
             className="size-fit p-1 hover:dark:bg-zinc-700 hover:bg-zinc-200"
-            size="icon"
+            size="sm"
             onClick={() => setConsoleOutputs([])}
           >
             <CrossSmallIcon />
@@ -149,7 +149,7 @@ return () => {
                   </div>
                 </div>
               ) : (
-                <div className="dark:text-zinc-50 text-zinc-900 w-full flex flex-col gap-2 overflow-x-scroll">
+                <div className="text-canvas-text w-full flex flex-col gap-2 overflow-x-scroll">
                   {consoleOutput.contents.map((content, index) =>
                     content.type === 'image' ? (
                       <picture key={`${consoleOutput.id}-${index}`}>

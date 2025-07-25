@@ -27,11 +27,11 @@ const diffSchema = new Schema({
         switch (mark.attrs.type) {
           case DiffType.Inserted:
             className =
-              'bg-green-100 text-green-700 dark:bg-green-500/70 dark:text-green-300';
+              'bg-success-bg text-success-text';
             break;
           case DiffType.Deleted:
             className =
-              'bg-red-100 line-through text-red-600 dark:bg-red-500/70 dark:text-red-300';
+              'bg-error-bg line-through text-error';
             break;
           default:
             className = '';

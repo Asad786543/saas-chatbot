@@ -8,7 +8,7 @@ import {
 } from '@/components/botui/tooltip';
 
 import { SidebarLeftIcon } from './icons';
-import { Button } from '../botui/button';
+import { Button } from '@/components/ui/button';
 
 export function SidebarToggle({
   className,
@@ -22,9 +22,10 @@ export function SidebarToggle({
           data-testid="sidebar-toggle-button"
           onClick={toggleSidebar}
           variant="outline"
-          className="md:px-2 md:h-fit"
+          size="sm"
+          iconOnly
+          leadingIcon={<SidebarLeftIcon size={18} />}
         >
-          <SidebarLeftIcon size={16} />
         </Button>
       </TooltipTrigger>
       <TooltipContent align="start">Toggle Sidebar</TooltipContent>

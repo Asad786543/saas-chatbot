@@ -54,8 +54,8 @@ return paddedRow;
       frozen: true,
       width: 50,
       renderCell: ({ rowIdx }: { rowIdx: number }) => rowIdx + 1,
-      cellClass: 'border-t border-r dark:bg-zinc-950 dark:text-zinc-50',
-      headerCellClass: 'border-t border-r dark:bg-zinc-900 dark:text-zinc-50',
+      cellClass: 'border-t border-r text-canvas-text bg-canvas-bg',
+      headerCellClass: 'border-t border-r text-canvas-text-contrast bg-canvas-bg',
     };
 
     const dataColumns = Array.from({ length: MIN_COLS }, (_, i) => ({

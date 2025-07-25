@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PlusIcon } from '@/components/chatbot/icons';
 import { SidebarHistory } from '@/components/chatbot/sidebar-history';
 import { SidebarUserNav } from '@/components/chatbot/sidebar-user-nav';
-import { Button } from '@/components/botui/button';
+import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarContent,

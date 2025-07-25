@@ -55,6 +55,7 @@ export interface TextareaProps
     error?: string;
     required?: boolean;
     containerClassName?: string;
+    bare?: boolean;
 }
 
 export interface SelectProps
@@ -90,10 +91,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-    ({ className, variant, size, label, error, required, containerClassName, ...props }, ref) => {
+    ({ className, variant, size, label, error, required, containerClassName, bare = false, ...props }, ref) => {
         const hasError = !!error;
         const inputVariant = hasError ? 'error' : variant;
         const labelVariant = hasError ? 'error' : 'default';
+
+        if (bare) {
+            return (
+                <textarea
+                    className={cn(inputVariants({ variant: inputVariant, size, className }), 'resize-vertical')}
+                    ref={ref}
+                    {...props}
+                />
+            );
+        }
 
         return (
             <div className={cn(containerClassName)}>
