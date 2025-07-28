@@ -95,8 +95,8 @@ const PurePreviewMessage = ({
                   <PreviewAttachment
                     key={attachment.url || idx}
                     attachment={{
-                      name: attachment.name ?? attachment.filename ?? 'file',
-                      contentType: attachment.contentType ?? attachment.mediaType,
+                      name: attachment.filename ?? 'file',
+                      contentType: attachment.mediaType,
                       url: attachment.url,
                     }}
                   />
